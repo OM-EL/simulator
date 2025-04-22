@@ -1,0 +1,13 @@
+Updated PRD (v2) — Bank‑Loan Simulator styled like Revolut
+
+Section | Requirement / Detail
+1 · Vision | Build a single‑command demo app that (a) lets prospects simulate Home, Vehicle and Personal loans, (b) captures leads, and (c) impresses by looking and feeling exactly like Revolut’s web properties.
+2 · Personas | Prospect (runs simulations) · Admin/Credit‑manager (tunes products & sees leads) · DevOps (deploys once).
+3 · User Flows | User ➜ choose loan type → enter amount/term/income → live results (payment, APR, amortisation chart) → “Email me this quote” → done.  Admin ➜ login → Dashboard (KPI cards) → Products tab (edit rates, LTV/DTI caps, fees, risk bands) → Leads tab (CSV export, status flag).
+4 · Functional Requirements | 1. Typed API (JSON) around a configurable simulation engine. 2. Hot‑reloadable ProductConfig table. 3. JWT auth for admin. 4. SendGrid (or mock SMTP) on quote‑request. 5. GDPR auto‑purge >90 days.
+5 · Visual Identity – “Look like Revolut” | Design system: use the public @revolut/ui‑kit React component library for layout, buttons, forms and modals. Mediumnpm Core palette (exact HEX): • Electric Purple #6E4CE5 • Sky Blue #81B2F1 • Midnight #261073 • Indigo #2C1385 • Mist #CFB9C4 (pale backgrounds) • Charcoal #39343B (text / dark mode) ColorsWall Gradients: primary gradient runs Electric‑Purple → Sky‑Blue at 45°. Typography: headline & UI font is Aeonik Pro at 1 : 1.618 modular scale; fallback to Inter/system-ui if the demo can’t embed a licensed file. Fonts In Use
+6 · Tech Stack (mirrors Revolut) | • React + TypeScript front‑end• Styled‑Components theming• React Query for data fetch• Fastify (Node) API with SQLite (demo) • Monorepo tooling via Rush, tests in Jest/RTL Medium
+7 · Non‑Functional | 95 + Lighthouse PWA score, WCAG AA contrast, first paint < 2 s, simulation calc < 50 ms.
+8 · Data Model | LoanProduct, Simulation, AdminUser tables remain as v1.
+9 · Stretch | PDF quote export • OAuth (Revolut ID?) sign‑in • Dark‑mode toggle (simply invert Mist ↔ Charcoal, preserve brand blue/purple).
+10 · Success Criteria | Demo audience perceives UI as “Revolut‑like” in ≤10 min from one Copilot agentic prompt.
