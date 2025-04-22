@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-mist min-h-screen text-charcoal;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-aeonik font-semibold;
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-xl font-medium transition-colors;
+  }
+
+  .btn-primary {
+    @apply btn bg-electric-purple text-white hover:bg-indigo;
+  }
+
+  .btn-secondary {
+    @apply btn bg-sky-blue text-midnight hover:bg-opacity-80;
+  }
+
+  .btn-outline {
+    @apply btn border border-electric-purple text-electric-purple hover:bg-electric-purple hover:bg-opacity-10;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-md p-6;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-mist focus:border-electric-purple focus:outline-none focus:ring-1 focus:ring-electric-purple;
+  }
+
+  .select-field {
+    @apply input-field appearance-none bg-no-repeat bg-right pr-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M7 10l5 5 5-5H7z' fill='%236E4CE5'/%3E%3C/svg%3E");
+    background-size: 24px;
+  }
+
+  .revolut-gradient {
+    @apply bg-revolut-gradient;
+  }
+
+  .main-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+}
