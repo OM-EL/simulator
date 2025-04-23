@@ -1,13 +1,532 @@
-Updated PRD (v2) — Bank‑Loan Simulator styled like Revolut
+# Bank Loan Simulator - Specifications for GitHub Copilot Agent
 
-Section | Requirement / Detail
-1 · Vision | Build a single‑command demo app that (a) lets prospects simulate Home, Vehicle and Personal loans, (b) captures leads, and (c) impresses by looking and feeling exactly like Revolut’s web properties.
-2 · Personas | Prospect (runs simulations) · Admin/Credit‑manager (tunes products & sees leads) · DevOps (deploys once).
-3 · User Flows | User ➜ choose loan type → enter amount/term/income → live results (payment, APR, amortisation chart) → “Email me this quote” → done.  Admin ➜ login → Dashboard (KPI cards) → Products tab (edit rates, LTV/DTI caps, fees, risk bands) → Leads tab (CSV export, status flag).
-4 · Functional Requirements | 1. Typed API (JSON) around a configurable simulation engine. 2. Hot‑reloadable ProductConfig table. 3. JWT auth for admin. 4. SendGrid (or mock SMTP) on quote‑request. 5. GDPR auto‑purge >90 days.
-5 · Visual Identity – “Look like Revolut” | Design system: use the public @revolut/ui‑kit React component library for layout, buttons, forms and modals. Mediumnpm Core palette (exact HEX): • Electric Purple #6E4CE5 • Sky Blue #81B2F1 • Midnight #261073 • Indigo #2C1385 • Mist #CFB9C4 (pale backgrounds) • Charcoal #39343B (text / dark mode) ColorsWall Gradients: primary gradient runs Electric‑Purple → Sky‑Blue at 45°. Typography: headline & UI font is Aeonik Pro at 1 : 1.618 modular scale; fallback to Inter/system-ui if the demo can’t embed a licensed file. Fonts In Use
-6 · Tech Stack (mirrors Revolut) | • React + TypeScript front‑end• Styled‑Components theming• React Query for data fetch• Fastify (Node) API with SQLite (demo) • Monorepo tooling via Rush, tests in Jest/RTL Medium
-7 · Non‑Functional | 95 + Lighthouse PWA score, WCAG AA contrast, first paint < 2 s, simulation calc < 50 ms.
-8 · Data Model | LoanProduct, Simulation, AdminUser tables remain as v1.
-9 · Stretch | PDF quote export • OAuth (Revolut ID?) sign‑in • Dark‑mode toggle (simply invert Mist ↔ Charcoal, preserve brand blue/purple).
-10 · Success Criteria | Demo audience perceives UI as “Revolut‑like” in ≤10 min from one Copilot agentic prompt.
+**Version:** 1.0.0  
+**Date:** 2025-04-23  
+**Author:** OM-EL  
+
+## 1. Project Overview
+
+Create a local bank loan simulator application that visually mimics Revolut's design style:
+- Home, vehicle, and personal loan calculators
+- User interface for loan simulations
+- Admin interface for product management and lead tracking
+- Database for storing loan products, simulations, and leads
+- All components running on a local machine
+- **Design requirement:** Application must look and feel like Revolut's interface
+
+## 2. Technical Stack Requirements
+
+- **Frontend:** React 18+ with TypeScript
+- **Backend:** Node.js with Fastify
+- **Database:** SQLite (for easy local setup)
+- **State Management:** Context API or Redux Toolkit
+- **Styling:** styled-components (using Revolut's color palette)
+- **Form Handling:** React Hook Form + Yup
+- **Data Visualization:** Chart.js or Recharts
+- **Authentication:** JWT with HttpOnly cookies
+- **Build Tool:** Vite
+
+## 3. Revolut-Inspired Design System
+
+### 3.1 Branding
+- **Logo:** Use Revolut's logo for demonstration purposes only
+  - Logo source: https://www.revolut.com/favicon/favicon.ico
+  - Use with appropriate disclaimer: "This is a demo app, not affiliated with Revolut"
+- **App Name:** "RevLoan Simulator" (fictional name for the demo)
+
+### 3.2 Visual Design
+- **Colors**:
+  - Primary: Electric Purple (#6E4CE5) - Revolut's signature purple
+  - Secondary: Sky Blue (#81B2F1)
+  - Dark: Midnight (#261073) - Dark background for cards
+  - Background Light: Mist (#CFB9C4) - For light mode
+  - Text/Dark Mode: Charcoal (#39343B)
+  - Success Green: (#0CDD92) - For positive indicators
+  - Warning: (#FFAC2F) - For cautionary indicators
+  - Error Red: (#FF4A60) - For errors/negative indicators
+
+- **Typography**:
+  - Primary Font: Aeonik Pro (Revolut's custom font)
+  - Fallback fonts: Inter, SF Pro Display, system-ui
+  - Base Size: 16px with 1:1.618 modular scale
+  - Weights: 300 (light), 400 (regular), 500 (medium), 700 (bold)
+  - Line height: 1.5 for body text, 1.2 for headings
+
+- **Component Styling**:
+  - Cards with 12px border radius
+  - Prominent purple-to-blue gradient for CTAs
+  - Monochromatic interface with purple accents
+  - Clean white space use (min 24px padding)
+  - Interactive elements with subtle hover states
+  - Shadows: light (0 4px 12px rgba(0,0,0,0.05)) for cards
+
+### 3.3 UI Component Requirements
+- Revolut-style navigation (bottom tabs for mobile, side nav for desktop)
+- Pill-shaped buttons with gradient backgrounds
+- Card-based content containers with subtle shadows
+- Circular progress indicators
+- Tab navigation with sliding indicator
+- Toggle switches with purple active state
+- Sliders with prominent handles
+- Results displayed in large, bold typography
+
+## 4. Data Models
+
+### 4.1 User/Admin
+```json
+{
+  "id": "uuid-string",
+  "username": "admin",
+  "email": "admin@example.com",
+  "passwordHash": "bcrypt-hashed-string",
+  "role": "admin | manager | viewer",
+  "createdAt": "2025-04-23T09:53:54Z",
+  "lastLoginAt": "2025-04-23T09:53:54Z",
+  "isActive": true
+}
+```
+
+### 4.2 Loan Product
+```json
+{
+  "id": "uuid-string",
+  "name": "Standard Home Mortgage",
+  "type": "HOME | VEHICLE | PERSONAL",
+  "minAmount": 50000,
+  "maxAmount": 1000000,
+  "minTerm": 60,
+  "maxTerm": 360,
+  "baseRate": 3.99,
+  "description": "Fixed-rate mortgage for primary residences",
+  "originationFee": 0.5,
+  "isActive": true,
+  "createdAt": "2025-04-23T09:53:54Z",
+  "updatedAt": "2025-04-23T09:53:54Z",
+  "riskTiers": [
+    {
+      "id": "uuid-string",
+      "name": "Excellent",
+      "minCreditScore": 800,
+      "maxCreditScore": 850,
+      "rateAdjustment": -0.5
+    },
+    {
+      "id": "uuid-string",
+      "name": "Good",
+      "minCreditScore": 740,
+      "maxCreditScore": 799,
+      "rateAdjustment": 0
+    },
+    {
+      "id": "uuid-string",
+      "name": "Fair",
+      "minCreditScore": 670,
+      "maxCreditScore": 739,
+      "rateAdjustment": 0.75
+    }
+  ]
+}
+```
+
+### 4.3 Simulation
+```json
+{
+  "id": "uuid-string",
+  "leadId": "uuid-string-or-null",
+  "productId": "uuid-string",
+  "loanAmount": 250000,
+  "termMonths": 360,
+  "interestRate": 3.99,
+  "monthlyPayment": 1192.10,
+  "totalInterest": 179156.00,
+  "simulationDate": "2025-04-23T09:53:54Z",
+  "ipAddress": "127.0.0.1",
+  "extraParams": {
+    "propertyValue": 300000,
+    "propertyType": "house",
+    "downPayment": 50000,
+    "includePropertyTax": true,
+    "propertyTaxAnnual": 2400
+  },
+  "emailSent": false,
+  "convertedToApplication": false
+}
+```
+
+### 4.4 Lead
+```json
+{
+  "id": "uuid-string",
+  "email": "user@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890",
+  "createdAt": "2025-04-23T09:53:54Z",
+  "status": "new | contacted | qualified | converted | closed",
+  "notes": "Interested in refinancing options",
+  "gdprConsentGiven": true,
+  "gdprConsentDate": "2025-04-23T09:53:54Z",
+  "purgeDate": "2025-07-23T09:53:54Z"
+}
+```
+
+## 5. Financial Calculation Formulas
+
+### 5.1 Standard Monthly Payment
+```
+PMT = P × r × (1 + r)^n / [(1 + r)^n - 1]
+
+Where:
+PMT = Monthly payment
+P = Principal (loan amount)
+r = Monthly interest rate (annual rate ÷ 12 ÷ 100)
+n = Total number of payments (years × 12)
+```
+
+### 5.2 Total Interest
+```
+Total Interest = (Monthly Payment × Number of Payments) - Principal
+```
+
+### 5.3 Loan-to-Value (LTV) Ratio
+```
+LTV = (Loan Amount / Property Value) × 100%
+```
+
+### 5.4 Debt-to-Income (DTI) Ratio
+```
+DTI = (Monthly Debt Payments / Monthly Gross Income) × 100%
+```
+
+### 5.5 Amortization Schedule
+```
+For each payment:
+Interest Payment = Current Balance × Monthly Rate
+Principal Payment = Monthly Payment - Interest Payment
+New Balance = Current Balance - Principal Payment
+```
+
+## 6. API Endpoints Specification
+
+### 6.1 Authentication
+```
+POST /api/auth/login            # Admin login
+POST /api/auth/logout           # Logout
+GET  /api/auth/me               # Get current user
+```
+
+### 6.2 Simulations
+```
+POST /api/simulations/home      # Home loan simulation
+POST /api/simulations/vehicle   # Vehicle loan simulation
+POST /api/simulations/personal  # Personal loan simulation
+GET  /api/simulations/:id       # Get saved simulation
+POST /api/simulations/email     # Email simulation results
+```
+
+### 6.3 Admin
+```
+GET    /api/admin/dashboard     # Get dashboard data
+GET    /api/admin/products      # List loan products
+POST   /api/admin/products      # Create loan product
+PUT    /api/admin/products/:id  # Update loan product
+DELETE /api/admin/products/:id  # Delete loan product
+GET    /api/admin/leads         # List captured leads
+PUT    /api/admin/leads/:id     # Update lead status
+GET    /api/admin/export/leads  # Export leads as CSV
+```
+
+## 7. User Scenarios
+
+### 7.1 Home Loan Simulation
+1. User lands on Revolut-styled home page with three loan type cards
+2. User selects "Home Loan" with a tap/click on the card
+3. User enters loan details using Revolut-style sliders and inputs:
+   - Loan amount: €250,000 (slider with purple highlight)
+   - Interest rate: 3.99%
+   - Term: 30 years (with tabs for common terms)
+   - Property value: €300,000
+   - Property type: House (segmented control)
+   - Down payment: €50,000
+4. User toggles options to include property tax (€2,400/year)
+5. User sees real-time calculation updates as they adjust sliders
+6. After all inputs, user taps "Calculate" button with Revolut gradient
+7. System presents results page with:
+   - Monthly payment prominently displayed (large bold text)
+   - Interactive amortization chart (Revolut-style visualization)
+   - Payment breakdown in circular chart
+   - Loan summary card
+8. User enters email to receive results via Revolut-style form
+9. System shows confirmation with animation
+
+### 7.2 Vehicle Loan Simulation
+1. User selects "Vehicle Loan" from options
+2. User enters details with Revolut-style controls:
+   - Loan amount: €25,000
+   - Interest rate: 4.49%
+   - Term: 60 months (with preset options in pills)
+   - Vehicle value: €28,000
+   - Vehicle type: New (toggle switch)
+   - Down payment: €3,000
+3. System calculates and displays results in Revolut card format
+4. User compares different term options using tabbed interface
+5. User emails results with a single tap on CTA
+
+### 7.3 Admin User Flow
+1. Admin logs in through Revolut-style secure login screen
+2. Admin views dashboard with Revolut-style KPI cards showing:
+   - 45 simulations run today (with sparkline chart)
+   - 18 leads captured (with conversion percentage)
+   - 40% conversion rate (circular progress indicator)
+   - Average loan amount: €220,000 (with trend indicator)
+3. Admin manages loan products through card-based interface
+4. Admin exports leads with a single tap on export button
+
+## 8. User Interface Requirements
+
+### 8.1 Specific Revolut-Style Elements
+- **Navigation Bar**: Bottom navigation on mobile, side navigation on desktop with Revolut logo
+- **Action Button**: Floating action button with gradient background
+- **Cards**: White cards with subtle shadow and 12px border radius
+- **Form Elements**:
+  - Sliders with circular handles and purple active track
+  - Text inputs with minimal borders, focus state with purple outline
+  - Toggle switches matching Revolut's style
+  - Radio buttons as segmented controls
+- **Results Display**:
+  - Large typography for key figures
+  - Purple gradient for emphasizing important information
+  - Circular progress indicators for percentages
+
+### 8.2 Required Views (with Revolut styling)
+
+#### User Interface
+1. Landing page with three card options and Revolut logo
+2. Loan parameter input form with Revolut-style sliders and inputs
+3. Results dashboard with:
+   - Revolut-style card layout
+   - Monthly payment in large Revolut typography
+   - Amortization chart using Revolut's visualization style
+   - Payment breakdown in Revolut's circular chart style
+4. Lead capture modal with Revolut form styling
+
+#### Admin Interface
+1. Revolut-style login screen with logo
+2. Dashboard with Revolut-style KPI cards and visualizations
+3. Product management screen with card-based UI
+4. Lead management with Revolut-style data tables
+5. Reports and exports section with Revolut's minimal design
+
+## 9. Database Schema (SQLite)
+
+```sql
+-- Users/Admin table
+CREATE TABLE users (
+  id TEXT PRIMARY KEY,
+  username TEXT UNIQUE NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  role TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  last_login_at TIMESTAMP,
+  is_active INTEGER DEFAULT 1
+);
+
+-- Loan Products table
+CREATE TABLE loan_products (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL,
+  min_amount REAL NOT NULL,
+  max_amount REAL NOT NULL,
+  min_term INTEGER NOT NULL,
+  max_term INTEGER NOT NULL,
+  base_rate REAL NOT NULL,
+  description TEXT,
+  origination_fee REAL DEFAULT 0,
+  is_active INTEGER DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Risk Tiers table
+CREATE TABLE risk_tiers (
+  id TEXT PRIMARY KEY,
+  product_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  min_credit_score INTEGER NOT NULL,
+  max_credit_score INTEGER NOT NULL,
+  rate_adjustment REAL NOT NULL,
+  FOREIGN KEY (product_id) REFERENCES loan_products (id) ON DELETE CASCADE
+);
+
+-- Leads table
+CREATE TABLE leads (
+  id TEXT PRIMARY KEY,
+  email TEXT NOT NULL,
+  first_name TEXT,
+  last_name TEXT,
+  phone TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status TEXT DEFAULT 'new',
+  notes TEXT,
+  gdpr_consent_given INTEGER DEFAULT 0,
+  gdpr_consent_date TIMESTAMP,
+  purge_date TIMESTAMP
+);
+
+-- Simulations table
+CREATE TABLE simulations (
+  id TEXT PRIMARY KEY,
+  lead_id TEXT,
+  product_id TEXT NOT NULL,
+  loan_amount REAL NOT NULL,
+  term_months INTEGER NOT NULL,
+  interest_rate REAL NOT NULL,
+  monthly_payment REAL NOT NULL,
+  total_interest REAL NOT NULL,
+  simulation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  ip_address TEXT,
+  extra_params TEXT, -- JSON string
+  email_sent INTEGER DEFAULT 0,
+  converted_to_application INTEGER DEFAULT 0,
+  FOREIGN KEY (lead_id) REFERENCES leads (id) ON DELETE SET NULL,
+  FOREIGN KEY (product_id) REFERENCES loan_products (id) ON DELETE CASCADE
+);
+```
+
+## 10. Request/Response Formats
+
+### 10.1 Home Loan Simulation Request
+```json
+{
+  "loanAmount": 250000,
+  "interestRate": 3.99,
+  "termYears": 30,
+  "propertyValue": 300000,
+  "propertyType": "house",
+  "downPayment": 50000,
+  "includePropertyTax": true,
+  "includeInsurance": false,
+  "propertyTaxAnnual": 2400
+}
+```
+
+### 10.2 Home Loan Simulation Response
+```json
+{
+  "simulationId": "uuid-string",
+  "loanAmount": 250000,
+  "interestRate": 3.99,
+  "termMonths": 360,
+  "monthlyPayment": 1192.10,
+  "totalMonthlyPayment": 1392.10,
+  "totalInterest": 179156.00,
+  "totalCost": 429156.00,
+  "ltv": 83.33,
+  "amortizationSchedule": [
+    {
+      "paymentNumber": 1,
+      "payment": 1192.10,
+      "principal": 317.10,
+      "interest": 875.00,
+      "balance": 249682.90
+    },
+    {
+      "paymentNumber": 2,
+      "payment": 1192.10,
+      "principal": 318.21,
+      "interest": 873.89,
+      "balance": 249364.69
+    }
+    // Additional entries...
+  ]
+}
+```
+
+### 10.3 Lead Capture Request
+```json
+{
+  "simulationId": "uuid-string",
+  "email": "user@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890",
+  "consentGiven": true
+}
+```
+
+## 11. Acceptance Criteria
+
+### 11.1 Functional Requirements
+1. Users can select and simulate three loan types (home, vehicle, personal)
+2. Calculations must be accurate using the specified formulas
+3. System captures leads with proper GDPR consent
+4. Admins can manage loan products and view leads
+5. Email functionality works (can use mock for local demo)
+6. Amortization schedules are correctly generated
+7. Users can compare different loan scenarios
+8. Visual charts accurately represent loan data
+
+### 11.2 Non-Functional Requirements
+1. All components run locally without external dependencies
+2. Initial page load under 2 seconds
+3. Calculations complete in under 100ms
+4. Mobile responsive design (320px to 1920px)
+5. WCAG AA level accessibility compliance
+6. Form validation with helpful error messages
+7. Proper authentication for admin features
+8. GDPR-compliant data handling with purge capability
+
+### 11.3 Design Requirements
+1. Interface visually matches Revolut's design system
+2. Consistent use of Revolut's color palette throughout
+3. Revolut-style animations for transitions and feedback
+4. Revolut logo appears in application header with disclaimer
+5. Responsive design that maintains Revolut's mobile-first approach
+6. Typography hierarchy matches Revolut's style
+
+## 12. Implementation Guidelines for GitHub Copilot Agent
+
+1. Start by setting up the visual design system to match Revolut
+2. Build reusable UI components that mimic Revolut's style
+3. Implement the loan calculation engine with all formulas
+4. Create the database schema and seed with initial data
+5. Develop API endpoints with proper validation
+6. Build user flows following the specified scenarios
+7. Implement admin dashboard with Revolut-style visualizations
+8. Add email functionality (can be mocked for local demo)
+9. Ensure responsive design works across all screen sizes
+10. Add disclaimer regarding Revolut logo usage for demo purposes
+
+## 13. Repository Structure
+
+```
+bank-loan-simulator/
+├── frontend/                   # React frontend application
+│   ├── public/                 # Static assets
+│   │   └── images/             # Including Revolut logo with disclaimer
+│   └── src/
+│       ├── assets/             # Images, fonts, etc.
+│       ├── components/         # Reusable UI components
+│       │   └── revolut/        # Revolut-styled components
+│       ├── contexts/           # React contexts
+│       ├── hooks/              # Custom React hooks
+│       ├── models/             # TypeScript interfaces
+│       ├── pages/              # Page components
+│       ├── services/           # API services
+│       └── utils/              # Utility functions
+├── backend/                    # Fastify backend
+│   ├── src/
+│   │   ├── config/             # Configuration files
+│   │   ├── controllers/        # Request handlers
+│   │   ├── db/                 # Database setup
+│   │   ├── models/             # Data models
+│   │   ├── routes/             # API routes
+│   │   └── services/           # Business logic
+│   └── db/                     # SQLite database
+├── .env.example                # Example environment variables
+└── README.md                   # Project documentation
+```
+
+Note to GitHub Copilot Agent: This application should create a demo loan simulator that visually resembles Revolut's design language. The Revolut logo is used purely for demonstration purposes with a clear disclaimer about non-affiliation. The application should run entirely locally with a SQLite database for easy setup and testing.
